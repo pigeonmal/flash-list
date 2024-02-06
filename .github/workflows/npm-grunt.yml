@@ -1,0 +1,51 @@
+name: NodeJS with Grunt
+
+on:
+  push:
+    branches: [ "mrickert/fabric" ]
+  pull_request:
+    branches: [ "mrickert/fabric" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+
+ - name: npm install
+        run: npm install
+      
+      - name: npm build
+        run: npm run build --if-present
+      
+      - name: Create temp folder
+        run: mkdir temp_dist
+
+      - name: Copy built files 
+        run: cp -r dist/* temp_dist/
+
+      - name: Copy package
+        run: cp package.json temp_dist/
+
+      - name: List root 
+        run: ls
+
+      - name: List target folder 
+        run: ls temp_dist
+          
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v3
+        with:
+          name: node-app
+          path: temp_dist/*
+        grunt
